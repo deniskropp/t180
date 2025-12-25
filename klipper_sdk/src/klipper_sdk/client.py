@@ -20,6 +20,15 @@ class KlipperClient:
             self._connection = open_dbus_connection(bus='SESSION')
         return self._connection
 
+    def get_current_content(self) -> Optional[str]:
+        """Retrieves the current clipboard content."""
+        try:
+            msg = new_method_call(self._address, "getClipboardContents")
+            reply = self._get_connection().send_and_get_reply(msg)
+            return reply[0]
+        except Exception:
+            return None
+
     def set_clipboard(self, text: str) -> None:
         """Sets the current system clipboard content."""
         msg = new_method_call(self._address, "setClipboardContents", "s", (text,))

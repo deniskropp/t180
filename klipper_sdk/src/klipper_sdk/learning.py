@@ -51,9 +51,16 @@ class LearningManager:
         return 0.75
 
     
-    def predict_usage(self, age: float) -> float:
-        # Mock prediction
-        return datetime.now().timestamp() + 3600
+    def predict_usage(self, age: float, history: Optional[List[float]] = None) -> float:
+        """
+        Uses Gen 7 TemporalPredictor to guess next usage time.
+        """
+        if not history:
+             return datetime.now().timestamp() + 3600
+             
+        predictor = TemporalPredictor()
+        predictor.history = sorted(history)
+        return predictor.predict_next()
 
 class TemporalPredictor:
     """

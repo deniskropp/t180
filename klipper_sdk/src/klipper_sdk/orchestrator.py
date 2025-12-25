@@ -25,19 +25,28 @@ class Orchestrator:
         """Loads and parses a .kl file."""
         print(f"[Orchestrator] Loading blueprint from {path}...")
         with open(path, 'r') as f:
-            # Skip the first line if it interacts poorly with yaml (e.g., ⫻kicklang:orchestration)
             content = f.read()
-            if content.startswith("⫻"):
-                content = content.split("\n", 1)[1]
-            
-            data = yaml.safe_load(content)
-            if isinstance(data, list) and data:
-                self.blueprint = data[0]
-            elif isinstance(data, dict):
-                self.blueprint = data
+            self.parse_blueprint(content)
+
+    def parse_blueprint(self, content: str):
+        """Parses a KickLang blueprint string."""
+        # Skip the first line if it interacts poorly with yaml (e.g., ⫻kicklang:orchestration)
+        if content.strip().startswith("⫻"):
+            # Find the first newline
+            parts = content.split("\n", 1)
+            if len(parts) > 1:
+                content = parts[1]
             else:
-                raise ValueError("Invalid blueprint format")
-            
+                content = "" # Empty if only header
+        
+        data = yaml.safe_load(content)
+        if isinstance(data, list) and data:
+            self.blueprint = data[0]
+        elif isinstance(data, dict):
+            self.blueprint = data
+        else:
+            raise ValueError("Invalid blueprint format")
+        
         # Parse Planes
         self._setup_agents(self.blueprint.get('planes', {}).get('agentic', []))
         

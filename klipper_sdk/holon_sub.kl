@@ -3,7 +3,7 @@ planes:
     - name: "InnerAgent"
       role: "SubProcessor"
       goal: "Process internal data"
-      prompt_engineering: "Processor returns: {{parent_task}} processed."
+      prompt_engineering: "Processor returns: {{task}} processed."
 
   structural:
     - name: "InnerPhase"
@@ -11,5 +11,5 @@ planes:
         - name: "InnerStep"
           agent: "InnerAgent"
           inputs: 
-            parent_task: "parent_task"
+            task: "task"
           outputs: "inner_result"
