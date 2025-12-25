@@ -94,7 +94,11 @@ class Orchestrator:
                 # In a real agentic loop, the agent would decide to call the tool.
                 # Here we simulate the agent "using" the tool on each item.
                 for entry in entries:
-                    txt = getattr(entry, 'text', '') or ''
+                    if isinstance(entry, dict):
+                        txt = entry.get('text', '') or ''
+                    else:
+                        txt = getattr(entry, 'text', '') or ''
+                        
                     res = tool.run(txt) if tool else "text"
                     results.append(res)
                 

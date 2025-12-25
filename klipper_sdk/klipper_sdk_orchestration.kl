@@ -1,0 +1,29 @@
+⫻kicklang:orchestration
+# Structural Plane: The Workflow
+planes:
+  structural:
+    - name: "Ingestion & Analysis"
+      description: "Analyze incoming clipboard entries"
+      steps:
+        - name: "analyze_entries"
+          agent: "DataAnalyst"
+          tool: "analyze_content_type"
+        
+    - name: "Prediction"
+      description: "Predict next user action"
+      steps:
+        - name: "predict_workflow"
+          agent: "Planner"
+          tool: "predict_workflow_score"
+
+  # Agentic Plane: The Workforce
+  agentic:
+    - name: "DataAnalyst"
+      role: "Analyst"
+      goal: "Determine the semantic type of clipboard content."
+      prompt_engineering: "You are an expert data analyst. Classify text as PYTHON, SQL, JSON, or TEXT."
+      
+    - name: "Planner"
+      role: "Strategist"
+      goal: "Predict the most likely subsequent user task."
+      prompt_engineering: "Given a sequence of data types, predict the next likely tool or action."

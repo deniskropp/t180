@@ -66,9 +66,19 @@ src/klipper_sdk/
 
 ---
 
+## 🛠 Prerequisites
+
+Before running the SDK, ensure you have the following:
+
+- **Linux OS** with KDE Plasma (for Klipper).
+- **Python 3.8+**.
+- **Klipper Service** running on D-Bus.
+
+---
+
 ## 🚀 Quick Start (Gen 5 Workflow)
 
-To run the full orchestration loop:
+To run the full orchestration loop with the provided blueprint:
 
 ```python
 from klipper_sdk.orchestrator import Orchestrator
@@ -76,10 +86,11 @@ from klipper_sdk.orchestrator import Orchestrator
 # 1. Initialize the Gen 5 Orchestrator
 orchestrator = Orchestrator()
 
-# 2. Load a KickLang Blueprint
+# 2. Load the KickLang Blueprint
+# Ensure 'klipper_sdk_orchestration.kl' is in your working directory
 orchestrator.load_blueprint("klipper_sdk_orchestration.kl")
 
-# 3. Inject Runtime Context (Real-time data from Gen 1)
+# 3. Inject Runtime Context (Simulated Gen 1 Data)
 context = {
     "entries": [
         {"text": "SELECT * FROM users", "type": "sql"},
@@ -90,7 +101,7 @@ context = {
 # 4. Execute the Agentic Workflow
 results = orchestrator.execute(dynamic_context=context)
 
-print("Orchestration Complete:", results)
+print("\nOrchestration Results:", results)
 ```
 
 ## 📦 Installation
