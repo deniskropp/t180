@@ -50,10 +50,60 @@ class LearningManager:
         # Mock prediction
         return 0.75
 
+    
     def predict_usage(self, age: float) -> float:
         # Mock prediction
         return datetime.now().timestamp() + 3600
 
+class TemporalPredictor:
+    """
+    Gen 7: Temporal Layer.
+    Predicts *when* an event will occur based on historical rhythm.
+    """
+    def __init__(self):
+        self.history = []
+
+    def add_event(self, timestamp: float):
+        self.history.append(timestamp)
+        self.history.sort()
+
+    def predict_next(self) -> float:
+        """
+        Simple rhythm analysis: Average Interval.
+        """
+        if len(self.history) < 2:
+            # Default to 1 hour from now if insufficient data
+            return datetime.now().timestamp() + 3600
+            
+        intervals = [t2 - t1 for t1, t2 in zip(self.history[:-1], self.history[1:])]
+        avg_interval = sum(intervals) / len(intervals)
+        
+        last_event = self.history[-1]
+        next_event = last_event + avg_interval
+        
+        # Ensure prediction is in the future
+        now = datetime.now().timestamp()
+        if next_event < now:
+            # If the predicted time is already past, project forward by intervals
+            while next_event < now:
+                next_event += avg_interval
+                
+        return next_event
+
 if __name__ == "__main__":
     manager = LearningManager()
-    # manager.engineer_features(...)
+    
+    # Gen 7 Test
+    print("Testing Temporal Predictor...")
+    pred = TemporalPredictor()
+    # Simulate an event happening every hour for the last 5 hours
+    base_time = datetime.now().timestamp() - (5 * 3600)
+    for i in range(5):
+        pred.add_event(base_time + (i * 3600))
+    
+    next_time = pred.predict_next()
+    print(f"Last Event: {datetime.fromtimestamp(pred.history[-1])}")
+    print(f"Predicted Next: {datetime.fromtimestamp(next_time)}")
+    
+    diff = next_time - pred.history[-1]
+    print(f"Gap: {diff} seconds (Expected ~3600)")

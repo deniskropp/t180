@@ -1,0 +1,15 @@
+planes:
+  agentic:
+    - name: "TheHolon"
+      type: "holon"
+      blueprint_path: "holon_sub.kl"
+      role: "RecursiveWrapper"
+
+  structural:
+    - name: "OuterPhase"
+      steps:
+        - name: "CallHolon"
+          agent: "TheHolon"
+          inputs:
+            task: "initial_task"
+          outputs: "final_result"

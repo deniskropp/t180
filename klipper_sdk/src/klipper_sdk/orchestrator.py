@@ -45,14 +45,28 @@ class Orchestrator:
         """Initializes agents from the blueprint."""
         print(f"[Orchestrator] Setting up {len(agent_configs)} agents...")
         for config in agent_configs:
-            agent = Agent(
-                name=config['name'],
-                role=config.get('role', 'Generalist'),
-                goal=config.get('goal', ''),
-                prompt_template=config.get('prompt_engineering', '')
-            )
+            is_holon = config.get('type') == 'holon' or 'blueprint_path' in config
+            
+            if is_holon:
+                from .holon import Holon
+                agent = Holon(
+                    name=config['name'],
+                    role=config.get('role', 'Holon'),
+                    goal=config.get('goal', 'Execute sub-workflow'),
+                    prompt_template=config.get('prompt_engineering', ''),
+                    blueprint_path=config.get('blueprint_path')
+                )
+                print(f"  - Registered HOLON: {agent.name}")
+            else:
+                agent = Agent(
+                    name=config['name'],
+                    role=config.get('role', 'Generalist'),
+                    goal=config.get('goal', ''),
+                    prompt_template=config.get('prompt_engineering', '')
+                )
+                print(f"  - Registered agent: {agent.name} ({agent.role})")
+            
             self.agent_registry.register(agent)
-            print(f"  - Registered agent: {agent.name} ({agent.role})")
 
     def execute(self, dynamic_context: Dict[str, Any] = None):
         """Executes the workflow defined in the structural plane."""

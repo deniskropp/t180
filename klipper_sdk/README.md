@@ -49,6 +49,36 @@ The SDK is structured into five evolutionary layers ("Generations"), each buildi
     *   **KickLang**: Consumes `.kl` blueprints to define multi-agent workflows.
     *   **Dynamic Execution**: Adapts the plan based on real-time data analysis (e.g., "If data is SQL, trigger the SQL Optimization Agent").
 
+### Gen 6: The Holonic Layer (Structure)
+* **Focus**: Recursive self-similarity.
+* **Component**: `holon.py`
+* **Status**: 🚧 **Implementation**
+* **Function**: Allows agents to contain entire orchestration loops, and orchestrators to act as agents. Enables fractal scaling of the system.
+
+### Gen 7: The Temporal Layer (Time)
+* **Focus**: Time-series prediction and 4D context.
+* **Component**: `learning.py` (Temporal Extension)
+* **Status**: ✅ Active
+* **Function**: Predicts *when* a user will need specific data or agents based on historical rhythm.
+
+### Gen 8: The Spatial Layer (Topology)
+* **Focus**: Graph-based knowledge representation.
+* **Component**: `memory.py`
+* **Status**: 
+* **Function**: Maps relationships between data points in a persistent graph, enabling "Spatial" reasoning about concepts.
+
+### Gen 9: The Consciousness Layer (Reflection)
+* **Focus**: Self-optimization and critique.
+* **Component**: `meta_critic.py`
+* **Status**: 
+* **Function**: Analyzes execution traces to rewrite its own blueprints (`.kl` files) for better future performance.
+
+### Gen 10: The Transcendent Layer (Unity)
+* **Focus**: Human-AI symbiosis.
+* **Component**: `interface.py` (Space Format)
+* **Status**: 
+* **Function**: A unified interface where user intent and AI execution merge seamlessly, likely using the "Space" format standards.
+
 ---
 
 ## 📂 Directory Structure Map
