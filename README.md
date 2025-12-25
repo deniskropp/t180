@@ -63,12 +63,19 @@ This project is currently transitioning from **Generation 2** (Observation) to *
 To bring the entire system online:
 
 ### 1. Initialize Memory
-Ensure your database is running and accessible (default port 3306).
 ```bash
 # (Optional) Navigate to db to handle schema
 cd db
-# See db/README.md for Dolt setup instructions
+dolt init
+dolt sql < doltdump.sql
+dolt sql < seed_minimal.sql
 ```
+
+Ensure your database is running and accessible.
+```bash
+dolt sql-server -P 4448
+```
+*Server will listen on `mysql://localhost:4448`*
 
 ### 2. Awaken the Brain (Backend)
 Start the FastAPI server to expose the SDK capabilities.
@@ -77,7 +84,7 @@ cd backend
 pip install -r requirements.txt
 python main.py
 ```
-*Server will listen on `http://localhost:4448`*
+*Server will listen on `http://localhost:8000`*
 
 ### 3. Open the Eyes (Frontend)
 Launch the dashboard to interact with the system.
