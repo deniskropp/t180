@@ -13,7 +13,22 @@ class ContentAnalysisTool(Tool):
             description="Analyze a text string to determine its type (url, sql_query, python_code, etc.). Args: text (str)"
         )
 
-    def run(self, text: str) -> str:
+    def run(self, data: Any) -> Any:
+        # Handle Batch
+        if isinstance(data, list):
+            return [self._analyze_single(item) for item in data]
+        return self._analyze_single(data)
+
+    def _analyze_single(self, item: Any) -> str:
+        # Handle Dict (extract text)
+        if isinstance(item, dict):
+            text = item.get('text', '') or ''
+        # Handle Object
+        elif hasattr(item, 'text'):
+            text = getattr(item, 'text', '') or ''
+        else:
+            text = str(item)
+
         if not text: return "binary"
         text = text.strip()
         
@@ -84,7 +99,15 @@ class WorkflowPredictionTool(Tool):
         
         # Secondary pass if texts provided
         if texts:
-            for txt in texts:
+            for txt_obj in texts:
+                # Extract text if dict
+                if isinstance(txt_obj, dict):
+                    txt = txt_obj.get('text', '') or ''
+                elif hasattr(txt_obj, 'text'):
+                    txt = getattr(txt_obj, 'text', '') or ''
+                else:
+                    txt = str(txt_obj)
+
                 txt = txt.lower() if txt else ""
                 if "pandas" in txt or "notebook" in txt or "csv" in txt: scores["Data Science"] += 1.0
                 if "react" in txt or "hook" in txt: scores["Frontend Development"] += 1.0

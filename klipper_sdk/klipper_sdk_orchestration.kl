@@ -8,6 +8,8 @@ planes:
         - name: "analyze_entries"
           agent: "DataAnalyst"
           tool: "analyze_content_type"
+          inputs: ["entries"]
+          outputs: "analysis_results"
         
     - name: "Prediction"
       description: "Predict next user action"
@@ -15,6 +17,10 @@ planes:
         - name: "predict_workflow"
           agent: "Planner"
           tool: "predict_workflow_score"
+          inputs: 
+            types: "analysis_results"
+            texts: "entries"
+          outputs: "prediction"
 
   # Agentic Plane: The Workforce
   agentic:

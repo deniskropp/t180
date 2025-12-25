@@ -73,7 +73,7 @@ class Orchestrator:
     def _execute_phase(self, phase: Dict[str, Any]):
         steps = phase.get('steps', [])
         for step in steps:
-            # print(f"  > Step: {step['name']}")
+            print(f"  > Step: {step['name']}")
             agent_name = step.get('agent')
             tool_name = step.get('tool')
             
@@ -81,42 +81,31 @@ class Orchestrator:
                 continue
                 
             agent = self.agent_registry.get_agent(agent_name)
+            tool = self.tool_registry.get_tool(tool_name) if tool_name else None
             
-            # Special logic for this use case: 
-            # If step is 'analyze_entries', we look for 'entries' in state and map the tool over them.
-            # If step is 'predict_workflow', we use the 'types' from previous step.
+            # Resolve Inputs
+            inputs_config = step.get('inputs', [])
+            context = {}
             
-            if step['name'] == 'analyze_entries':
-                entries = self.workflow_state.get('entries', [])
-                results = []
-                tool = self.tool_registry.get_tool(tool_name) if tool_name else None
-                
-                # In a real agentic loop, the agent would decide to call the tool.
-                # Here we simulate the agent "using" the tool on each item.
-                for entry in entries:
-                    if isinstance(entry, dict):
-                        txt = entry.get('text', '') or ''
-                    else:
-                        txt = getattr(entry, 'text', '') or ''
-                        
-                    res = tool.run(txt) if tool else "text"
-                    results.append(res)
-                
-                self.workflow_state['analysis_results'] = results
-                # print(f"    [Analyst] Analyzed {len(entries)} entries.")
-                
-            elif step['name'] == 'predict_workflow':
-                types = self.workflow_state.get('analysis_results', [])
-                entries = self.workflow_state.get('entries', [])
-                texts = [getattr(e, 'text', '') for e in entries]
-                
-                tool = self.tool_registry.get_tool(tool_name) if tool_name else None
-                
-                if tool:
-                    prediction = tool.run(types, texts)
-                    self.workflow_state['prediction'] = prediction
-                    # print(f"    [Predictor] Prediction: {prediction['name']}")
+            if isinstance(inputs_config, list):
+                # Direct mapping: arg name = state key
+                for key in inputs_config:
+                    context[key] = self.workflow_state.get(key)
+            elif isinstance(inputs_config, dict):
+                # Remapping: arg name = inputs_config[arg name] -> value from state
+                for arg_name, state_key in inputs_config.items():
+                    context[arg_name] = self.workflow_state.get(state_key)
             
-            else:
-                # Fallback to generic agent execution
-                pass
+            # Execute Agent
+            # The Agent will use the tool if provided, passing 'context' as args.
+            result = agent.execute(context, tools=[tool] if tool else None)
+            
+            # Store Outputs
+            output_key = step.get('outputs')
+            if output_key:
+                self.workflow_state[output_key] = result
+                # Optional: specific logging
+                # if isinstance(result, list):
+                #     print(f"    [{agent.role}] Produced {len(result)} items for '{output_key}'.")
+                # else:
+                #     print(f"    [{agent.role}] Produced result for '{output_key}'.")

@@ -30,10 +30,29 @@ class Agent:
         self.prompt_template = prompt_template
         self.llm = llm or MockLLM()
         
-    def execute(self, context: Dict[str, Any]) -> str:
-        """Executes the agent's task by populating the prompt and calling the LLM."""
-        prompt = self._build_prompt(context)
+    def execute(self, context: Dict[str, Any], tools: List[Any] = None) -> Any:
+        """Executes the agent's task. If a tool is provided, it uses the tool."""
         print(f"[{self.name}] Executing task...")
+        
+        # Gen 4/5 Logic: If a tool is strictly assigned, use it.
+        if tools and len(tools) > 0:
+            tool = tools[0]
+            # Heuristic: Pass context as kwargs if keys match, 
+            # or if context has 1 item and tool takes something else, pass value.
+            # Simplified: Pass *values* if 1 item, else **kwargs.
+            if len(context) == 1:
+                arg_val = list(context.values())[0]
+                try:
+                    # Try passing as single argument
+                    return tool.run(arg_val)
+                except TypeError:
+                    # Fallback to kwargs
+                    return tool.run(**context)
+            else:
+                 return tool.run(**context)
+
+        # Fallback to LLM generation (Gen 4 Base)
+        prompt = self._build_prompt(context)
         response = self.llm.generate(prompt)
         print(f"[{self.name}] Finished.")
         return response
@@ -43,7 +62,9 @@ class Agent:
         for key, value in context.items():
             placeholder = "{{" + key + "}}" # e.g., {{current_goal}}
             if placeholder in prompt:
-                prompt = prompt.replace(placeholder, str(value))
+                # Handle lists gracefully in prompt
+                val_str = str(value)
+                prompt = prompt.replace(placeholder, val_str)
         return prompt
 
 class AgentRegistry:
