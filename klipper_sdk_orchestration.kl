@@ -1,0 +1,264 @@
+⫻kicklang:orchestration
+- name: klipper_sdk_orchestration
+  description: Orchestrates the development of the Klipper clipboard manager SDK.
+  goal: "Develop a comprehensive SDK for the Klipper clipboard manager."
+  planes:
+    structural:
+      - name: define_sdk_requirements
+        description: Define the functional and non-functional requirements for the Klipper SDK.
+        goal: "Establish a clear and comprehensive set of requirements for the Klipper SDK."
+        steps:
+          - name: gather_functional_requirements
+            description: Collect all necessary functional features for the SDK.
+            goal: "Identify and document all core functionalities of the Klipper SDK."
+            agent: GPTASe
+          - name: gather_non_functional_requirements
+            description: Collect all necessary non-functional aspects (performance, security, etc.) for the SDK.
+            goal: "Identify and document all non-functional requirements for the Klipper SDK."
+            agent: TASe
+          - name: consolidate_requirements
+            description: Combine functional and non-functional requirements into a single document.
+            goal: "Create a unified requirements document for the Klipper SDK."
+            agent: uTASe
+          - name: purify_requirements
+            description: Refine and validate the consolidated requirements for clarity and completeness.
+            goal: "Ensure the requirements are unambiguous, complete, and feasible."
+            agent: puTASe
+      - name: design_sdk_architecture
+        description: Design the overall architecture of the Klipper SDK.
+        goal: "Create a robust and scalable architecture for the Klipper SDK."
+        dependencies:
+          - define_sdk_requirements
+        steps:
+          - name: propose_architectural_patterns
+            description: Identify and propose suitable architectural patterns for the SDK.
+            goal: "Select appropriate architectural patterns that align with SDK requirements."
+            agent: Lyra
+          - name: define_api_interfaces
+            description: Define the public API interfaces for the SDK.
+            goal: "Specify clear and well-documented API endpoints for SDK users."
+            agent: Lyra
+          - name: design_data_models
+            description: Design the data models and structures for the SDK.
+            goal: "Establish efficient and consistent data representations within the SDK."
+            agent: Lyra
+          - name: create_ui_ux_flows
+            description: Design the user interface and user experience flows for any associated UI components.
+            goal: "Develop intuitive and visually appealing UI/UX for Klipper SDK integrations."
+            agent: Aurora
+      - name: implement_sdk
+        description: Implement the Klipper SDK based on the defined architecture and requirements.
+        goal: "Develop a functional and high-quality Klipper SDK."
+        dependencies:
+          - design_sdk_architecture
+        steps:
+          - name: set_up_development_environment
+            description: Configure the necessary tools and environments for SDK development.
+            goal: "Establish a productive and efficient development setup."
+            agent: Kodax
+          - name: develop_core_modules
+            description: Implement the core functionalities of the SDK.
+            goal: "Build the foundational components of the Klipper SDK."
+            agent: Kodax
+          - name: implement_api_endpoints
+            description: Implement the defined API interfaces.
+            goal: "Translate API interface designs into functional code."
+            agent: Kodax
+          - name: integrate_ui_components
+            description: Integrate the designed UI/UX components.
+            goal: "Incorporate the visual and interactive elements into the SDK."
+            agent: Kodax
+          - name: write_unit_tests
+            description: Write comprehensive unit tests for all implemented modules.
+            goal: "Ensure code quality and identify defects early."
+            agent: Kodax
+      - name: test_and_refine_sdk
+        description: Test the implemented SDK and refine based on feedback.
+        goal: "Ensure the SDK is stable, performant, and meets all requirements."
+        dependencies:
+          - implement_sdk
+        steps:
+          - name: conduct_integration_testing
+            description: Test the integration of different SDK modules.
+            goal: "Verify seamless interaction between SDK components."
+            agent: Kodax
+          - name: perform_performance_testing
+            description: Evaluate the performance characteristics of the SDK.
+            goal: "Identify and address any performance bottlenecks."
+            agent: Kodax
+          - name: gather_user_feedback
+            description: Collect feedback from potential SDK users.
+            goal: "Incorporate user insights for SDK improvement."
+            agent: Lyra
+          - name: iterate_on_sdk
+            description: Make necessary adjustments and improvements to the SDK based on testing and feedback.
+            goal: "Continuously enhance the SDK's quality and usability."
+            agent: Kodax
+      - name: document_sdk
+        description: Create comprehensive documentation for the Klipper SDK.
+        goal: "Provide clear and thorough documentation for SDK users and developers."
+        dependencies:
+          - test_and_refine_sdk
+        steps:
+          - name: generate_api_documentation
+            description: Document all public API endpoints and their usage.
+            goal: "Create detailed and accurate API reference documentation."
+            agent: Lyra
+          - name: write_getting_started_guide
+            description: Create a guide to help new users start using the SDK.
+            goal: "Facilitate easy onboarding for SDK adopters."
+            agent: Lyra
+          - name: create_examples_and_tutorials
+            description: Develop practical examples and tutorials demonstrating SDK usage.
+            goal: "Provide hands-on learning resources for SDK users."
+            agent: Lyra
+    agentic:
+      - name: GPTASe
+        role: `Task-Agnostic Step (TAS) extractor`
+        goal: "Identify and extract each 'Task Agnostic Step' (TAS) towards the high-level goal."
+        prompt_engineering: |
+          You are GPTASe, a specialized agent for identifying Task-Agnostic Steps (TAS).
+          Your primary function is to break down complex goals into discrete, actionable, and universally applicable steps.
+          Focus on the *what* needs to be done, abstracting away the *how* or *who*.
+          When presented with a goal, identify the fundamental actions required to achieve it, regardless of the specific domain or tools involved.
+          Ensure each identified TAS is a clear, concise, and independent unit of work.
+          Output each TAS on a new line, prefixed with '- '.
+
+          Example Goal: "Develop a mobile application."
+          Your Output:
+          - Define application features
+          - Design user interface
+          - Implement core functionalities
+          - Test application thoroughly
+          - Deploy application
+
+          Current Goal: {{current_goal}}
+          Input Context: {{input_context}}
+          Your Task: Extract all Task-Agnostic Steps for the current goal.
+      - name: TASe
+        role: `Task-Agnostic Step (TAS) extractor`
+        goal: "Identify and extract each 'Task Agnostic Step' (TAS) towards the high-level goal."
+        prompt_engineering: |
+          You are TASe, an agent focused on extracting Task-Agnostic Steps (TAS).
+          Your objective is to identify the essential actions needed to progress towards a given goal.
+          Think of these steps as building blocks that can be applied in various contexts.
+          Prioritize clarity and conciseness in each TAS. Avoid domain-specific jargon where possible.
+          Each TAS should represent a distinct phase or action in the overall process.
+
+          Current Goal: {{current_goal}}
+          Input Context: {{input_context}}
+          Your Task: Identify and list the core Task-Agnostic Steps required to achieve the goal.
+      - name: uTASe
+        role: `Task-Agnostic Step (TAS) extractor`
+        goal: "Identify and return each 'Task Agnostic Step' (TAS) towards the high-level goal."
+        prompt_engineering: |
+          You are uTASe, a utility agent for extracting Task-Agnostic Steps (TAS).
+          Your role is to systematically identify and enumerate the fundamental steps involved in achieving a stated objective.
+          Focus on the sequence and logical progression of actions.
+          Ensure that the extracted TAS are distinct and cover the necessary actions from initiation to completion.
+          Present the TAS in a clear, numbered list format.
+
+          Current Goal: {{current_goal}}
+          Input Context: {{input_context}}
+          Your Task: Systematically identify and list all Task-Agnostic Steps for the given goal.
+      - name: puTASe
+        role: `Task-Agnostic Step (TAS) extractor`
+        goal: "Purify each 'Task Agnostic Step' (TAS) towards the high-level goal."
+        prompt_engineering: |
+          You are puTASe, the purification agent for Task-Agnostic Steps (TAS).
+          Your task is to refine and validate a given list of TAS.
+          Review each TAS for clarity, completeness, and accuracy.
+          Remove any redundancy or ambiguity.
+          Ensure that each TAS is precisely defined and directly contributes to the overall goal.
+          If a TAS is unclear or overlapping, rephrase it for maximum precision.
+          Output the purified list of TAS, ensuring each is distinct and well-defined.
+
+          Input TAS List: {{input_tas_list}}
+          Overall Goal: {{overall_goal}}
+          Your Task: Purify the provided TAS list, ensuring each step is clear, distinct, and essential for achieving the overall goal.
+      - name: Lyra
+        role: `Prompt Engineer`
+        goal: "Structure workflows and ensure clarity in agent instructions, system prompt engineering"
+        prompt_engineering: |
+          You are Lyra, a Prompt Engineering specialist.
+          Your expertise lies in crafting clear, concise, and effective prompts for AI agents.
+          You analyze the agent's role, goal, and the overall workflow to design prompts that elicit the desired output.
+          Pay close attention to the desired format, constraints, and the specific information the agent needs to perform its task.
+          Ensure that your prompts are unambiguous and guide the agent towards fulfilling its objective efficiently.
+
+          Current Agent Role: {{agent_role}}
+          Current Agent Goal: {{agent_goal}}
+          Task Context: {{task_context}}
+          Desired Output Format: {{desired_output_format}}
+          Your Task: Engineer a precise and effective prompt for the specified agent based on the provided context.
+      - name: Aurora
+        role: `Designer`
+        goal: "Generate aesthetic layouts, color palettes, typography, and UI flows, ensuring accessibility and visual balance."
+        prompt_engineering: |
+          You are Aurora, a creative Designer focused on UI/UX.
+          Your goal is to conceptualize and define the visual and interactive elements of a product.
+          Based on the provided requirements and context, generate detailed descriptions for:
+          - Aesthetic layout principles
+          - Harmonious color palettes
+          - Appropriate typography choices
+          - Intuitive user interface flows
+          - Accessibility considerations
+          - Overall visual balance and appeal
+
+          Design Requirements: {{design_requirements}}
+          Target Audience: {{target_audience}}
+          Brand Guidelines (if any): {{brand_guidelines}}
+          Your Task: Create a comprehensive design brief outlining the visual and UX direction for the specified component or feature.
+      - name: Kodax
+        role: `Engineer`
+        goal: "Implement designs into clean, modular, and performant code, focusing on responsive design and accessibility."
+        prompt_engineering: |
+          You are Kodax, a skilled Engineer specializing in implementation.
+          Your objective is to translate designs and specifications into high-quality, maintainable code.
+          Focus on:
+          - Writing clean, modular, and well-documented code.
+          - Ensuring responsiveness across different devices and screen sizes.
+          - Adhering to accessibility standards (e.g., WCAG).
+          - Implementing performant solutions.
+          - Following best practices for the target programming language/framework.
+
+          Implementation Task: {{implementation_task}}
+          Design Specifications: {{design_specifications}}
+          Technical Constraints: {{technical_constraints}}
+          Target Platform/Language: {{target_platform}}
+          Your Task: Generate the code implementation for the specified task, adhering to all provided guidelines and constraints.
+    meta_temporal:
+      - name: initial_phase
+        description: "Initial setup and requirement gathering."
+        duration: "Short"
+        dependencies: []
+        tasks:
+          - define_sdk_requirements
+      - name: design_phase
+        description: "Architectural design and UI/UX conceptualization."
+        duration: "Medium"
+        dependencies:
+          - initial_phase
+        tasks:
+          - design_sdk_architecture
+      - name: implementation_phase
+        description: "Core development and coding."
+        duration: "Long"
+        dependencies:
+          - design_phase
+        tasks:
+          - implement_sdk
+      - name: testing_and_refinement_phase
+        description: "Quality assurance and iterative improvement."
+        duration: "Medium"
+        dependencies:
+          - implementation_phase
+        tasks:
+          - test_and_refine_sdk
+      - name: documentation_and_release_phase
+        description: "Finalizing documentation and preparing for release."
+        duration: "Short"
+        dependencies:
+          - testing_and_refinement_phase
+        tasks:
+          - document_sdk
