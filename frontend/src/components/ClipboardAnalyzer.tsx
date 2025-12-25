@@ -55,7 +55,21 @@ export const ClipboardAnalyzer: React.FC = () => {
     return entries.filter(entry => {
       if (filters.starredOnly && !entry.starred) return false;
       if (filters.mimetype !== 'all' && !entry.mimetypes.includes(filters.mimetype)) return false;
-      // Add time range logic here if needed
+      // Time range logic
+      const now = new Date();
+      const entryDate = new Date(entry.added_time * 1000);
+      
+      if (filters.timeRange === 'today') {
+        const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+        if (entryDate < startOfToday) return false;
+      } else if (filters.timeRange === 'week') {
+        const startOfWeek = new Date(now.setDate(now.getDate() - 7));
+        if (entryDate < startOfWeek) return false;
+      } else if (filters.timeRange === 'month') {
+        const startOfMonth = new Date(now.setMonth(now.getMonth() - 1));
+        if (entryDate < startOfMonth) return false;
+      }
+
       return true;
     }).sort((a, b) => b.added_time - a.added_time);
   }, [entries, filters]);
@@ -119,6 +133,17 @@ export const ClipboardAnalyzer: React.FC = () => {
           >
             <option value="all">All Types</option>
             {uniqueMimeTypes.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+
+          <select 
+            className="ca-select"
+            value={filters.timeRange}
+            onChange={(e) => setFilters(prev => ({ ...prev, timeRange: e.target.value as any }))}
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
           </select>
 
           <button 

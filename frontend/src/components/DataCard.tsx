@@ -11,7 +11,7 @@ import css from 'react-syntax-highlighter/dist/esm/languages/prism/css';
 import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
 import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Download, Copy, ZoomIn, ZoomOut, Check } from 'lucide-react';
+import { Download, Copy, ZoomIn, ZoomOut, Check, FileText, Image, Code, Database, Terminal, FileJson } from 'lucide-react';
 
 // Register languages
 SyntaxHighlighter.registerLanguage('tsx', tsx);
@@ -32,32 +32,27 @@ interface DataCardProps {
 const getLanguageFromMime = (mimetypes: string): string => {
   const mime = mimetypes.split(',')[0].toLowerCase();
   
-  const map: Record<string, string> = {
-    'application/json': 'json',
-    'text/x-python': 'python',
-    'application/x-python-code': 'python',
-    'text/javascript': 'javascript',
-    'application/javascript': 'javascript',
-    'text/typescript': 'typescript',
-    'application/typescript': 'typescript',
-    'text/css': 'css',
-    'text/sql': 'sql',
-    'application/sql': 'sql',
-    'text/html': 'html',
-    'text/markdown': 'markdown',
-    'text/x-sh': 'bash',
-    'text/plain': 'text'
-  };
-
-  // Check for exact matches
-  if (map[mime]) return map[mime];
-  
-  // Heuristics
   if (mime.includes('json')) return 'json';
   if (mime.includes('sql')) return 'sql';
   if (mime.includes('python')) return 'python';
+  if (mime.includes('javascript') || mime.includes('js')) return 'javascript';
+  if (mime.includes('typescript') || mime.includes('ts')) return 'typescript';
+  if (mime.includes('css')) return 'css';
+  if (mime.includes('html')) return 'html';
+  if (mime.includes('sh') || mime.includes('bash')) return 'bash';
+  if (mime.includes('image')) return 'image';
   
   return 'text';
+};
+
+const getIconForMime = (mimetype: string) => {
+  const mime = mimetype.split(',')[0].toLowerCase();
+  if (mime.includes('image')) return <Image size={16} />;
+  if (mime.includes('json')) return <FileJson size={16} />;
+  if (mime.includes('sql')) return <Database size={16} />;
+  if (mime.includes('python') || mime.includes('javascript') || mime.includes('typescript') || mime.includes('code')) return <Code size={16} />;
+  if (mime.includes('sh') || mime.includes('bash')) return <Terminal size={16} />;
+  return <FileText size={16} />;
 };
 
 const getExtensionFromMime = (mimetype: string): string => {
@@ -81,6 +76,7 @@ const getExtensionFromMime = (mimetype: string): string => {
 export const DataCard: React.FC<DataCardProps> = ({ entry, onToggleStar }) => {
   const [fontSize, setFontSize] = useState(14);
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const date = new Date(entry.added_time * 1000).toLocaleString();
   const language = getLanguageFromMime(entry.mimetypes);
@@ -112,7 +108,9 @@ export const DataCard: React.FC<DataCardProps> = ({ entry, onToggleStar }) => {
     <div className="data-card">
       <div className="dc-header">
         <div className="dc-header-left">
-           <span className="dc-type-badge">{language.toUpperCase()}</span>
+           <span className="dc-type-icon" title={entry.mimetypes}>
+             {getIconForMime(entry.mimetypes)}
+           </span>
            <span className="dc-mime-info">{entry.mimetypes.split(',')[0]}</span>
         </div>
         
@@ -176,13 +174,33 @@ export const DataCard: React.FC<DataCardProps> = ({ entry, onToggleStar }) => {
                 fontSize: `${fontSize}px`,
                 backgroundColor: 'transparent',
                 padding: '1rem',
-                minHeight: '100px'
+                minHeight: '100px',
+                maxHeight: expanded ? 'none' : '300px',
+                overflowY: 'hidden'
             }}
             wrapLines={true}
             wrapLongLines={true}
          >
           {entry.text || '(No text content)'}
         </SyntaxHighlighter>
+        {entry.text && entry.text.length > 500 && (
+            <button 
+                className="dc-expand-btn"
+                onClick={() => setExpanded(!expanded)}
+                style={{
+                    width: '100%',
+                    padding: '8px',
+                    background: 'var(--bg-secondary)',
+                    border: 'none',
+                    borderTop: '1px solid var(--border-color)',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                }}
+            >
+                {expanded ? 'Show Less' : 'Show More'}
+            </button>
+        )}
       </div>
       
       <div className="dc-footer">
