@@ -1,0 +1,29 @@
+⫻kicklang:orchestration
+- name: workflow_prediction
+  description: Analyzes clipboard entries to predict user workflow.
+  planes:
+    structural:
+      - name: analysis_phase
+        description: Analyze content and predict workflow.
+        steps:
+          - name: analyze_entries
+            description: Analyze types of recent clipboard entries.
+            agent: Analyst
+            tool: analyze_content_type
+          - name: predict_workflow
+            description: Aggregate analysis and predict workflow.
+            agent: Predictor
+            tool: predict_workflow_score
+    agentic:
+      - name: Analyst
+        role: Content Analyst
+        goal: Analyze raw text to identify content types.
+        prompt_engineering: |
+          You are an Analyst. Your job is to classify text content.
+          (Note: In this implementation, the agent delegates directly to the 'analyze_content_type' tool).
+      - name: Predictor
+        role: Workflow Predictor
+        goal: synthesize analysis results into a workflow prediction.
+        prompt_engineering: |
+          You are a Predictor. Your job is to determine the user's workflow based on content types.
+          (Note: In this implementation, the agent delegates directly to the 'predict_workflow_score' tool).

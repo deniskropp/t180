@@ -43,31 +43,42 @@ class WorkflowPrediction(BaseModel):
     confidence: float
     reasoning: str
 
-# Reusing Analyzer Logic (Simplified for this file)
-def analyze_content_type(text: str) -> str:
-    if not text: return "binary"
-    text = text.strip()
-    if re.match(r'^https?://', text): return "url"
-    if "SELECT" in text.upper() and "FROM" in text.upper(): return "sql_query"
-    code_indicators = ['def ', 'class ', 'import ', 'return ', '{', '}', ';']
-    if any(ind in text for ind in code_indicators) and len(text.splitlines()) > 1: return "code_snippet"
-    return "text"
+import sys
+import os
+
+# Add SDK to path
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "klipper_sdk/src"))
+from klipper_sdk.orchestrator import Orchestrator
+
+# Initialize Orchestrator (Single instance for the app)
+orchestrator = Orchestrator()
+blueprint_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "workflow_prediction.kl")
+orchestrator.load_blueprint(blueprint_path)
 
 def predict_workflow(entries: List[ClipboardEntry]) -> WorkflowPrediction:
     if not entries:
-        return WorkflowPrediction(name="Unknown", confidence=0.0, reasoning="No data")
+        return WorkflowPrediction(name="Unknown", confidence=0.0, reasoning="No data available.")
+        
+    # Execute Gen 5 Workflow
+    # We pass the entries as dynamic context. 
+    # The blueprint 'workflow_prediction.kl' defines the steps 'analyze_entries' and 'predict_workflow'.
     
-    recent = entries[:5]
-    types = [analyze_content_type(e.text or "") for e in recent]
-    total = len(recent)
-    type_counts = {t: types.count(t) for t in set(types)}
+    # We use a recent subset to mimic the previous logic's optimization
+    recent_entries = entries[:10]
     
-    if type_counts.get('url', 0) / total >= 0.6:
-        return WorkflowPrediction(name="Research", confidence=0.8, reasoning="Mostly URLs in recent history.")
-    if type_counts.get('code_snippet', 0) / total >= 0.4 or type_counts.get('sql_query', 0) > 0:
-        return WorkflowPrediction(name="Development", confidence=0.7, reasoning="Code or SQL detected.")
+    result_state = orchestrator.execute(dynamic_context={"entries": recent_entries})
     
-    return WorkflowPrediction(name="General", confidence=0.3, reasoning="Mixed content types.")
+    # Extract prediction from the result state
+    pred_data = result_state.get('prediction')
+    
+    if not pred_data:
+        return WorkflowPrediction(name="Error", confidence=0.0, reasoning="Orchestration failed to produce prediction.")
+        
+    return WorkflowPrediction(
+        name=pred_data.get('name', 'Unknown'),
+        confidence=pred_data.get('confidence', 0.0),
+        reasoning=pred_data.get('reasoning', '')
+    )
 
 @app.get("/api/entries", response_model=List[ClipboardEntry])
 def get_entries():
