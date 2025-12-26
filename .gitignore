@@ -1,2 +1,7 @@
 __pycache__
 *.egg-info
+files
+logs
+sessions
+__pycache__
+.pytest_cache
