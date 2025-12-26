@@ -47,12 +47,12 @@ import sys
 import os
 
 # Add SDK to path
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "klipper_sdk/src"))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "klipper_sdk", "src"))
 from klipper_sdk.orchestrator import Orchestrator
 
 # Initialize Orchestrator (Single instance for the app)
 orchestrator = Orchestrator()
-blueprint_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "workflow_prediction.kl")
+blueprint_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "workflow_prediction.kl")
 orchestrator.load_blueprint(blueprint_path)
 
 def predict_workflow(entries: List[ClipboardEntry]) -> WorkflowPrediction:
